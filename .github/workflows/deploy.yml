@@ -1,0 +1,46 @@
+name: CI/CD Pipeline for Microservices
+
+on:
+  push:
+    branches:
+      - main  # Runs on every push to the main branch
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🐳 Set Up Docker
+        run: |
+          sudo apt update
+          sudo apt install -y docker.io docker-compose
+          docker --version
+          docker-compose --version
+
+      - name: 🔑 Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: 🛠️ Build and Push Docker Images
+        run: |
+          docker build -t mydockerhub/authentication-service ./Authentication_Service
+          docker build -t mydockerhub/data-entry ./WebApp_Enter
+          docker build -t mydockerhub/analytics-service ./Analytics_Service
+          docker build -t mydockerhub/results-service ./WebApp_Results
+          
+          docker push mydockerhub/authentication-service
+          docker push mydockerhub/data-entry
+          docker push mydockerhub/analytics-service
+          docker push mydockerhub/results-service
+
+      - name: 🚀 Deploy (Optional - If Using a Server)
+        run: |
+          docker-compose up -d
