@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results WebApp Login</title>
+    <title>Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f4f4f4;
-            margin: 40px;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
         }
 
         .container {
-            width: 40%;
-            margin: auto;
+            width: 30%;
+            max-width: 400px;
             background: white;
             padding: 20px;
             border-radius: 10px;
@@ -24,12 +28,12 @@
         h1 {
             color: #333;
         }
-
+        
         input {
             width: 80%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             border-radius: 5px;
         }
 
@@ -46,17 +50,27 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Login to View Statistics</h1>
-        <form action="/results-login" method="POST">
+        <h1>Login</h1>
+        <form method="POST">
             <input type="text" name="username" placeholder="Username" required><br>
             <input type="password" name="password" placeholder="Password" required><br>
             <button type="submit">Login</button>
         </form>
+
+        {% if error %}
+        <p class="error-message">{{ error }}</p>  <!-- ✅ Show error message under the form -->
+        {% endif %}
     </div>
 
 </body>

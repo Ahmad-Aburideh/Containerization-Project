@@ -23,15 +23,16 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None  # Initialize error message as None
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
-        print(f"🔹 Login Request: Username = {username}, Password = {password}")
-
         conn = get_db_connection()
         if not conn:
-            return "Database connection failed."
+            error = "Database connection failed."
+            return render_template("login.html", error=error)
 
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM AuthUsers WHERE username = %s", (username,))
@@ -39,16 +40,15 @@ def login():
         conn.close()
 
         if user and user['password'] == password:
-            print("✅ Authentication Successful!")
             session['user_id'] = user['id']
-            return redirect("http://192.168.100.9:5002")  # Redirect to DataEntry WebApp
+            return redirect("http://192.168.100.9:5002")  # Successful Login
         else:
-            print("❌ Invalid credentials!")
-            return "Invalid credentials, please try again."
+            error = "Invalid credentials! Please try again."  #Set error message
 
-    return render_template("login.html")
+    return render_template("login.html", error=error)  # Pass error message to HTML
 
-@app.route('/dashboard')  # ✅ Correct route name
+
+@app.route('/dashboard')  #Correct route name
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))  # Ensure user is authenticated

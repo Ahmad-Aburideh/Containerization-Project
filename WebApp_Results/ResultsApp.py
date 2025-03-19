@@ -7,7 +7,7 @@ from urllib.parse import quote_plus
 app = Flask(__name__, template_folder='templates')
 app.secret_key = os.urandom(24)
 
-# ✅ **MySQL Configuration**
+#MySQL Connection Configuration**
 def get_db_connection():
     try:
         return mysql.connector.connect(
@@ -17,10 +17,10 @@ def get_db_connection():
             database='ahmad2003'
         )
     except mysql.connector.Error as err:
-        print(f"❌ Database Connection Error: {err}")
+        print(f"Database Connection Error: {err}")
         return None
 
-# ✅ **MongoDB Configuration**
+#  MongoDB Configuration
 password = quote_plus("ahmad@2003")  # Encode password safely
 mongo_client = MongoClient(f"mongodb://ahmad_qasem:{password}@host.docker.internal:27017/")
 mongo_db = mongo_client["analytics_db"]
@@ -30,9 +30,11 @@ statistics_collection = mongo_db["statistics"]
 def home():
     return redirect(url_for('results_login'))  # Redirect to login page
 
-# ✅ **Fix: Use MySQL Authentication for WebApp_Results**
+#Use MySQL Authentication for WebApp_Results
 @app.route('/results-login', methods=['GET', 'POST'])
 def results_login():
+    error = None  # Default: No error
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -41,7 +43,7 @@ def results_login():
 
         conn = get_db_connection()
         if not conn:
-            return "❌ Database connection failed."
+            return "Database connection failed."
 
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM AuthUsers WHERE username = %s", (username,))
@@ -49,14 +51,16 @@ def results_login():
         conn.close()
 
         if user and user['password'] == password:
-            print("✅ Authentication Successful!")
+            print("Authentication Successful!")
             session['user_id'] = user['id']  # Store user session
-            return redirect(url_for('dashboard'))  # Redirect to stats page
+            return redirect(url_for('dashboard'))  # Redirect to dashboard
         else:
-            print("❌ Invalid credentials!")
-            return "Invalid credentials, please try again."
+            print("Invalid credentials!")
+            error = "Invalid credentials, please try again."  # Error message
 
-    return render_template("results_login.html")  # Login page
+    return render_template("results_login.html", error=error)  # Pass error to template
+
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -65,11 +69,11 @@ def dashboard():
 
     return render_template("stats_dashboard.html")  # Show the dashboard page
 
-# ✅ **Fix: Add /get-stats route**
+#/get-stats route to get Statistics
 @app.route('/get-stats', methods=['GET'])
 def get_stats():
     try:
-        # Fetch the latest statistics from MongoDB
+        # Fetch the latest Statistics from MongoDB
         latest_stats = statistics_collection.find().sort("_id", -1).limit(1)
         stats_list = []
         for stat in latest_stats:
@@ -83,7 +87,7 @@ def get_stats():
         if not stats_list:
             return jsonify({"error": "No statistics found"}), 404
 
-        return jsonify({"statistics": stats_list})  # Return stats as JSON
+        return jsonify({"statistics": stats_list})  # Return Statistics as JSON
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
