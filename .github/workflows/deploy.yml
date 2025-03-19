@@ -21,10 +21,10 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: 🐳 Set Up Docker
+      - name: 🐳 Install Docker & Docker Compose (Fixed)
         run: |
           sudo apt update
-          sudo apt install -y docker.io docker-compose
+          sudo apt install -y docker docker-compose
           docker --version
           docker-compose --version
 
