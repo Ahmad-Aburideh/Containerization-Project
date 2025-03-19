@@ -9,6 +9,7 @@ COPY . /app
 
 # Install any needed packages specified in AuthRequirements.txt
 RUN pip install --no-cache-dir -r AuthRequirements.txt
+RUN pip install mysql-connector-python
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 40px;
+        }
+
+        .container {
+            width: 50%;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-height: 500px;  /* ✅ Prevents excessive scrolling */
+        overflow: hidden;   /* ✅ Prevents infinite scroll */
+        }
+
+        canvas {
+            max-width: 600px;
+            max-height: 400px;  /* ✅ Restrict height to prevent layout issues */
+            margin: auto;
+            display: block;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Statistics Dashboard</h1>
+        <canvas id="statsChart"></canvas>
+    </div>
+
+    <script>
+        let statsChart = null;  // ✅ Ensure only ONE chart instance exists
+    
+        function fetchStats() {
+            fetch('/get-stats')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Checking API Data:", data);  // ✅ Debugging
+    
+                    if (data.statistics && data.statistics.length > 0) {
+                        const latestStats = data.statistics[0]; // Get the latest statistics
+    
+                        console.log("Fetched Stats:", latestStats);  // ✅ Debugging
+    
+                        updateChart(latestStats.max, latestStats.min, latestStats.average);
+                    } else {
+                        document.body.innerHTML += "<p>No statistics available. Compute stats first.</p>";
+                    }
+                })
+                .catch(error => console.error('Error fetching stats:', error));
+        }
+    
+        function updateChart(max, min, avg) {
+            const ctx = document.getElementById('statsChart').getContext('2d');
+    
+            // ✅ Destroy previous chart if it exists
+            if (statsChart instanceof Chart) {
+                statsChart.destroy();
+            }
+    
+            // ✅ Create a new chart instance
+            statsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Max', 'Min', 'Average'],
+                    datasets: [{
+                        label: 'Statistics',
+                        data: [max, min, avg],
+                        backgroundColor: ['red', 'blue', 'green']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+    
+            console.log("✅ Chart Updated Successfully!");  // ✅ Debugging
+        }
+    
+        // ✅ Load statistics on page load
+        document.addEventListener("DOMContentLoaded", fetchStats);
+    </script>    
+
+</body>
+</html>
