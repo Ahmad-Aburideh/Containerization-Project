@@ -41,14 +41,14 @@ def login():
 
         if user and user['password'] == password:
             session['user_id'] = user['id']
-            return redirect("http://192.168.100.9:5002")  # Successful Login
+            return redirect("http://127.0.0.1:5002")  #  Successful Login
         else:
-            error = "Invalid credentials! Please try again."  #Set error message
+            error = "Invalid credentials! Please try again."  # Set error message
 
     return render_template("login.html", error=error)  # Pass error message to HTML
 
 
-@app.route('/dashboard')  #Correct route name
+@app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))  # Ensure user is authenticated

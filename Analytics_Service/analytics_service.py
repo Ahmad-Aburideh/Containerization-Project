@@ -7,7 +7,7 @@ from bson import ObjectId  # To handle MongoDB ObjectId serialization
 
 app = Flask(__name__)
 
-# MySQL Configuration
+# MySQL 
 mysql_config = {
     'host': 'host.docker.internal',
     'user': 'ahmad_qasem',
